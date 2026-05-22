@@ -120,7 +120,7 @@ hr{border:none;border-top:1px solid var(--border);margin:10px 0}
         <div class="fg"><label>Nombre *</label><input id="f-nombre" placeholder="García, Juan Carlos" autocomplete="off"></div>
         <div class="fg"><label>Teléfono *</label><input id="f-tel" type="tel" placeholder="+54 9 261..."></div>
         <div class="fg"><label>Dirección *</label><input id="f-dir" placeholder="Calle y número"></div>
-        <div class="fg"><label>Barrio</label><input id="f-barrio" placeholder="Nombre del barrio"></div>
+        <div class="fg"><label>Barrio</label><input id="f-barrio" value="Las Retamas" list="barrios-list" placeholder="Nombre del barrio"><datalist id="barrios-list"><option value="Las Retamas"></datalist></div>
         <div class="fg"><label>Email</label><input id="f-email" type="email" placeholder="cliente@email.com"></div>
         <div class="fg"><label>Cantidad de ambientes</label><input id="f-ambientes" type="number" min="1" placeholder="Ej: 5"></div>
       </div>
@@ -171,6 +171,18 @@ hr{border:none;border-top:1px solid var(--border);margin:10px 0}
         <div class="fg"><label>Ubicación del router Zigbee</label><input id="f-router" placeholder="Ej: Pasillo central, primer piso"></div>
         <div class="fg"><label>Distancia al sensor más alejado (mts)</label><input id="f-dist" type="number" placeholder="15"></div>
         <div class="fg"><label>Obstáculos para la señal</label><input id="f-obstaculos" placeholder="Ej: Paredes gruesas, sótano, metal"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-title">🏠 Instalación</div></div>
+      <div class="card-body">
+        <div class="fg"><label>Ubicación router WiFi</label><input id="f-wifi-ubicacion" placeholder="Ej: Living, arriba del router de Fibertel"></div>
+        <div class="fg full"><label>Detalles router WiFi</label><input id="f-wifi-detalle" placeholder="Ej: Señal buena, sin obstáculos"></div>
+        <div class="fg"><label>Ubicación central</label><input id="f-central-ubicacion" placeholder="Ej: Garage, pared lateral"></div>
+        <div class="fg full"><label>Detalles central</label><input id="f-central-detalle" placeholder="Ej: Cerca de toma corriente, espacio para caja"></div>
+        <div class="fg"><label>Salida para sirena</label><input id="f-sirena-ubicacion" placeholder="Ej: Frente exterior, bajo techo"></div>
+        <div class="fg full"><label>Detalles sirena</label><input id="f-sirena-detalle" placeholder="Ej: Cable a pasar por pared, necesita soporte"></div>
       </div>
     </div>
 
@@ -233,6 +245,12 @@ function defData(){ return {nid:1, relevamientos:[]}; }
 let DB;
 try{ DB=JSON.parse(localStorage.getItem(SKEY)); if(!DB||!DB.relevamientos) DB=defData(); }
 catch(e){ DB=defData(); }
+function updateBarriosList(){
+  var dl=document.getElementById('barrios-list');
+  if(!dl) return;
+  var barrios=[...new Set(['Las Retamas'].concat((DB.relevamientos||[]).map(function(r){return r.barrio||'';}).filter(Boolean)))];
+  dl.innerHTML=barrios.map(function(b){return '<option value="'+b+'">';}).join('');
+}
 function save(){ localStorage.setItem(SKEY,JSON.stringify(DB)); }
 
 let curId = null;
@@ -249,7 +267,8 @@ function goTo(p){
   });
   document.getElementById('bn-form').classList.remove('on');
   document.getElementById('tctx').textContent='';
-  if(p==='lista'){ renderStats(); renderLista(); }
+  if(p==='lista'){ renderStats();
+updateBarriosList(); renderLista(); }
 }
 
 // STATS
@@ -354,6 +373,12 @@ function guardarRel(){
     router:document.getElementById('f-router').value,
     distancia:document.getElementById('f-dist').value,
     obstaculos:document.getElementById('f-obstaculos').value,
+    wifiUbicacion:document.getElementById('f-wifi-ubicacion')?document.getElementById('f-wifi-ubicacion').value:'',
+    wifiDetalle:document.getElementById('f-wifi-detalle')?document.getElementById('f-wifi-detalle').value:'',
+    centralUbicacion:document.getElementById('f-central-ubicacion')?document.getElementById('f-central-ubicacion').value:'',
+    centralDetalle:document.getElementById('f-central-detalle')?document.getElementById('f-central-detalle').value:'',
+    sirenaUbicacion:document.getElementById('f-sirena-ubicacion')?document.getElementById('f-sirena-ubicacion').value:'',
+    sirenaDetalle:document.getElementById('f-sirena-detalle')?document.getElementById('f-sirena-detalle').value:'',
     tecnico:document.getElementById('f-tecnico').value,
     estado:document.getElementById('f-estado').value,
     obs:document.getElementById('f-obs').value,
